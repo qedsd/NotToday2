@@ -240,12 +240,12 @@ namespace NotToday.ViewModels
                         new LocalIntelStandingSetting()
                         {
                             Name = "红",
-                            Color = Color.FromArgb(145, 2, 2),
+                            Color = Color.FromArgb(111, 4, 4),
                         },
                         new LocalIntelStandingSetting()
                         {
                             Name = "白",
-                            Color = Color.FromArgb(136,136,136),
+                            Color = Color.FromArgb(110,110,110),
                         },
                     }
                 };
@@ -299,7 +299,7 @@ namespace NotToday.ViewModels
             ProcSetting.StandingSettings.Add(new LocalIntelStandingSetting()
             {
                 Name = "红",
-                Color = Color.FromArgb(145, 2, 2)
+                Color = Color.FromArgb(111, 4, 4)
             });
         });
         public ICommand PickSoundFileCommand => new RelayCommand(async () =>
