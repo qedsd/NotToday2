@@ -423,6 +423,11 @@
                                         Header="{StaticResource LocalIntel_Param_MainColorSpan}"
                                         Minimum="0"
                                         Value="{x:Bind VM.ProcSetting.AlgorithmParameter.MainColorSpan, Mode=TwoWay}" />
+                                    <NumberBox
+                                        x:Name="NumberBox_ColorMatchThreshold"
+                                        Header="{StaticResource LocalIntel_Param_ColorMatchThreshold}"
+                                        Minimum="0"
+                                        Value="{x:Bind VM.ProcSetting.AlgorithmParameter.ColorMatchThreshold, Mode=TwoWay}" />
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>

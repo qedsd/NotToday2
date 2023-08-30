@@ -50,6 +50,7 @@ namespace NotToday.Views
             formatter.NumberRounder = rounder;
             NumberBox_FillThresholdV.NumberFormatter = formatter;
             NumberBox_FillThresholdH.NumberFormatter = formatter;
+            NumberBox_ColorMatchThreshold.NumberFormatter = formatter;
         }
 
         private void Button_RemoveStanding_Click(object sender, RoutedEventArgs e)

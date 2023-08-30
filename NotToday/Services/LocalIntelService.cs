@@ -83,7 +83,7 @@ namespace NotToday.Services
                     {
                         foreach (var refColors in sender.StandingSettings)
                         {
-                            if (IsMatch(refColors.Color, vec3bs[i]))
+                            if (IsMatch(refColors.Color, vec3bs[i], sender.AlgorithmParameter.ColorMatchThreshold))
                             {
                                 matchList.Add(new Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>(rects[i], refColors));
                                 break;
@@ -195,13 +195,13 @@ namespace NotToday.Services
                 }
             }
         }
-        private bool IsMatch(System.Drawing.Color refColor, OpenCvSharp.Vec3b targetColor, float threshold = 0.2f)
+        private bool IsMatch(System.Drawing.Color refColor, OpenCvSharp.Vec3b targetColor, double threshold = 0.2f)
         {
-            if ((float)Math.Abs(targetColor.Item0 - refColor.R) / (refColor.R == 0 ? 255 : refColor.R) < threshold)
+            if ((double)Math.Abs(targetColor.Item0 - refColor.R) / (refColor.R == 0 ? 255 : refColor.R) < threshold)
             {
-                if ((float)Math.Abs(targetColor.Item1 - refColor.G) / (refColor.G == 0 ? 255 : refColor.G) < threshold)
+                if ((double)Math.Abs(targetColor.Item1 - refColor.G) / (refColor.G == 0 ? 255 : refColor.G) < threshold)
                 {
-                    if ((float)Math.Abs(targetColor.Item2 - refColor.B) / (refColor.B == 0 ? 255 : refColor.B) < threshold)
+                    if ((double)Math.Abs(targetColor.Item2 - refColor.B) / (refColor.B == 0 ? 255 : refColor.B) < threshold)
                     {
                         return true;
                     }
@@ -209,13 +209,13 @@ namespace NotToday.Services
             }
             return false;
         }
-        private bool IsMatch(OpenCvSharp.Vec3b refColor, OpenCvSharp.Vec3b targetColor, float threshold = 0.2f)
+        private bool IsMatch(OpenCvSharp.Vec3b refColor, OpenCvSharp.Vec3b targetColor, double threshold = 0.2f)
         {
-            if ((float)Math.Abs(targetColor.Item0 - refColor.Item0) / (refColor.Item0 == 0 ? 255 : refColor.Item0) < threshold)
+            if ((double)Math.Abs(targetColor.Item0 - refColor.Item0) / (refColor.Item0 == 0 ? 255 : refColor.Item0) < threshold)
             {
-                if ((float)Math.Abs(targetColor.Item1 - refColor.Item1) / (refColor.Item1 == 0 ? 255 : refColor.Item1) < threshold)
+                if ((double)Math.Abs(targetColor.Item1 - refColor.Item1) / (refColor.Item1 == 0 ? 255 : refColor.Item1) < threshold)
                 {
-                    if ((float)Math.Abs(targetColor.Item2 - refColor.Item2) / (refColor.Item2 == 0 ? 255 : refColor.Item2) < threshold)
+                    if ((double)Math.Abs(targetColor.Item2 - refColor.Item2) / (refColor.Item2 == 0 ? 255 : refColor.Item2) < threshold)
                     {
                         return true;
                     }

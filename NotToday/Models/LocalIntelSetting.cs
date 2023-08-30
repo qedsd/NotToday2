@@ -246,6 +246,16 @@ namespace NotToday.Models
             get => mainColorSpan;
             set => SetProperty(ref mainColorSpan, value);
         }
+
+        private double colorMatchThreshold = 0.2;
+        /// <summary>
+        /// 声望RGB识别阈值百分比
+        /// </summary>
+        public double ColorMatchThreshold
+        {
+            get => colorMatchThreshold;
+            set => SetProperty(ref colorMatchThreshold, value);
+        }
     }
 
     public class LocalIntelNotify
