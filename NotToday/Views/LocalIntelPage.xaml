@@ -167,6 +167,15 @@
                                         </Button.Content>
                                     </Button>
                                 </Grid>
+                                <Grid Margin="0,8">
+                                    <Button HorizontalAlignment="Stretch" Command="{x:Bind VM.CheckGithubCommand}">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Github" />
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>

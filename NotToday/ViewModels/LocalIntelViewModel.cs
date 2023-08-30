@@ -332,6 +332,10 @@ namespace NotToday.ViewModels
         {
             System.Diagnostics.Process.Start("explorer.exe", System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configs"));
         });
+        public ICommand CheckGithubCommand => new RelayCommand(() =>
+        {
+            System.Diagnostics.Process.Start("explorer.exe", @"https://github.com/qedsd/NotToday2");
+        });
         public void RemoveStanding(LocalIntelStandingSetting standingSetting)
         {
             if (standingSetting != null)
