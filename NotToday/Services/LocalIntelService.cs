@@ -198,6 +198,7 @@ namespace NotToday.Services
                 }
             }
             sourceMat.Dispose();
+            sourceMat2.Dispose();
             grayMat.Dispose();
             edgeMat.Dispose();
         }

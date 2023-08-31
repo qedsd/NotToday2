@@ -263,32 +263,32 @@ namespace NotToday.Helpers
                 foreach (var pos in poss)
                 {
                     var rgb = input.At<Vec3b>(pos.Y, pos.X);
-                    r += rgb.Item0;
+                    b += rgb.Item0;
                     g += rgb.Item1;
-                    b += rgb.Item2;
-                    if (maxR < rgb.Item0)
+                    r += rgb.Item2;
+                    if (maxB < rgb.Item0)
                     {
-                        maxR = rgb.Item0;
+                        maxB = rgb.Item0;
                     }
                     if (maxG < rgb.Item1)
                     {
                         maxG = rgb.Item1;
                     }
-                    if (maxB < rgb.Item2)
+                    if (maxR < rgb.Item2)
                     {
-                        maxB = rgb.Item2;
+                        maxR = rgb.Item2;
                     }
-                    if (minR > rgb.Item0)
+                    if (minB > rgb.Item0)
                     {
-                        minR = rgb.Item0;
+                        minB = rgb.Item0;
                     }
-                    if (minG < rgb.Item1)
+                    if (minG > rgb.Item1)
                     {
                         minG = rgb.Item1;
                     }
-                    if (minB < rgb.Item2)
+                    if (minR > rgb.Item2)
                     {
-                        minB = rgb.Item2;
+                        minR = rgb.Item2;
                     }
                 }
                 //移除最大最小值
@@ -299,7 +299,7 @@ namespace NotToday.Helpers
                 g -= minG;
                 b -= minB;
                 int actullyCount = poss.Count - 2;
-                return new Vec3b((byte)(r / actullyCount), (byte)(g / actullyCount), (byte)(b / actullyCount));
+                return new Vec3b((byte)(b / actullyCount), (byte)(g / actullyCount), (byte)(r / actullyCount));
             }
         }
         /// <summary>
