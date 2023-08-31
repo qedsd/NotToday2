@@ -55,6 +55,7 @@ namespace NotToday.ViewModels
                     procSetting.OnScreenshotChanged -= ProcSetting_OnScreenshotChanged;
                     procSetting.OnEdgeImgChanged -= ProcSetting_OnEdgeImgChanged;
                     procSetting.OnStandingRectsChanged -= ProcSetting_OnStandingRectsChanged;
+                    value.OnGrayImgChanged -= Value_OnGrayImgChanged;
                 }
                 if (SetProperty(ref procSetting, value))
                 {
@@ -63,6 +64,7 @@ namespace NotToday.ViewModels
                         value.OnScreenshotChanged += ProcSetting_OnScreenshotChanged;
                         value.OnEdgeImgChanged += ProcSetting_OnEdgeImgChanged;
                         value.OnStandingRectsChanged += ProcSetting_OnStandingRectsChanged;
+                        value.OnGrayImgChanged += Value_OnGrayImgChanged;
                     }
                 }
             }
@@ -75,44 +77,54 @@ namespace NotToday.ViewModels
             set => SetProperty(ref running, value);
         }
 
-        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource1;
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_Source;
         /// <summary>
         /// 声望区域原图
         /// </summary>
-        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource1
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_Source
         {
-            get => imageSource1;
-            set => SetProperty(ref imageSource1, value);
+            get => imageSource_Source;
+            set => SetProperty(ref imageSource_Source, value);
         }
 
-        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource2;
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_Edge;
         /// <summary>
         /// 声望区域轮廓图
         /// </summary>
-        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource2
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_Edge
         {
-            get => imageSource2;
-            set => SetProperty(ref imageSource2, value);
+            get => imageSource_Edge;
+            set => SetProperty(ref imageSource_Edge, value);
         }
 
-        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource3;
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_DrawRect;
         /// <summary>
         /// 声望区域矩形识别图
         /// </summary>
-        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource3
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_DrawRect
         {
-            get => imageSource3;
-            set => SetProperty(ref imageSource3, value);
+            get => imageSource_DrawRect;
+            set => SetProperty(ref imageSource_DrawRect, value);
         }
 
-        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource4;
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_DrawMainColorPos;
         /// <summary>
         /// 声望区域取色位置图
         /// </summary>
-        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource4
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_DrawMainColorPos
         {
-            get => imageSource4;
-            set => SetProperty(ref imageSource4, value);
+            get => imageSource_DrawMainColorPos;
+            set => SetProperty(ref imageSource_DrawMainColorPos, value);
+        }
+
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_Gray;
+        /// <summary>
+        /// 灰度图
+        /// </summary>
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_Gray
+        {
+            get => imageSource_Gray;
+            set => SetProperty(ref imageSource_Gray, value);
         }
 
         private int selectedThemeIndex = (int)ThemeSelectorService.Theme;
@@ -455,59 +467,76 @@ namespace NotToday.ViewModels
             var m = img.Clone() as Bitmap;
             Window?.DispatcherQueue.TryEnqueue(() =>
             {
-                if (ImageSource1 == null)
+                if (ImageSource_Source == null)
                 {
-                    ImageSource1 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(m.Width, m.Height);
+                    ImageSource_Source = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(m.Width, m.Height);
                 }
-                else if (ImageSource1.PixelWidth != m.Width || ImageSource1.PixelHeight != m.Height)
+                else if (ImageSource_Source.PixelWidth != m.Width || ImageSource_Source.PixelHeight != m.Height)
                 {
-                    ImageSource1 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(m.Width, m.Height);
+                    ImageSource_Source = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(m.Width, m.Height);
                 }
-                ImageHelper.BitmapWriteToWriteableBitmap(ImageSource1, m);
+                ImageHelper.BitmapWriteToWriteableBitmap(ImageSource_Source, m);
                 m.Dispose();
             });
         }
         private void ProcSetting_OnStandingRectsChanged(LocalIntelProcSetting sender, OpenCvSharp.Mat img, List<OpenCvSharp.Rect> rects)
         {
-            var afterDrawRectMat = IntelImageHelper.DrawRects(img, rects);
-            var afterDrawMainColorPos = IntelImageHelper.DrawMainColorPos(img, rects, sender.AlgorithmParameter.MainColorSpan);
+            var m = img.Clone();
+            var afterDrawRectMat = IntelImageHelper.DrawRects(m, rects);
+            var afterDrawMainColorPos = IntelImageHelper.DrawMainColorPos(m, rects, sender.AlgorithmParameter.MainColorSpan);
             Window?.DispatcherQueue.TryEnqueue(() =>
             {
-                if (ImageSource3 == null)
+                if (ImageSource_DrawRect == null)
                 {
-                    ImageSource3 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawRectMat.Width, afterDrawRectMat.Height);
+                    ImageSource_DrawRect = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawRectMat.Width, afterDrawRectMat.Height);
                 }
-                else if (ImageSource3.PixelWidth != afterDrawRectMat.Width || ImageSource3.PixelHeight != afterDrawRectMat.Height)
+                else if (ImageSource_DrawRect.PixelWidth != afterDrawRectMat.Width || ImageSource_DrawRect.PixelHeight != afterDrawRectMat.Height)
                 {
-                    ImageSource3 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawRectMat.Width, afterDrawRectMat.Height);
+                    ImageSource_DrawRect = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawRectMat.Width, afterDrawRectMat.Height);
                 }
-                ImageSource3.SetSource(afterDrawRectMat.ToMemoryStream().AsRandomAccessStream());
+                ImageSource_DrawRect.SetSource(afterDrawRectMat.ToMemoryStream().AsRandomAccessStream());
 
-                if (ImageSource4 == null)
+                if (ImageSource_DrawMainColorPos == null)
                 {
-                    ImageSource4 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawMainColorPos.Width, afterDrawMainColorPos.Height);
+                    ImageSource_DrawMainColorPos = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawMainColorPos.Width, afterDrawMainColorPos.Height);
                 }
-                else if (ImageSource4.PixelWidth != afterDrawMainColorPos.Width || ImageSource4.PixelHeight != afterDrawMainColorPos.Height)
+                else if (ImageSource_DrawMainColorPos.PixelWidth != afterDrawMainColorPos.Width || ImageSource_DrawMainColorPos.PixelHeight != afterDrawMainColorPos.Height)
                 {
-                    ImageSource4 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawMainColorPos.Width, afterDrawMainColorPos.Height);
+                    ImageSource_DrawMainColorPos = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(afterDrawMainColorPos.Width, afterDrawMainColorPos.Height);
                 }
-                ImageSource4.SetSource(afterDrawMainColorPos.ToMemoryStream().AsRandomAccessStream());
+                ImageSource_DrawMainColorPos.SetSource(afterDrawMainColorPos.ToMemoryStream().AsRandomAccessStream());
             });
         }
-
-        private void ProcSetting_OnEdgeImgChanged(LocalIntelProcSetting sender, OpenCvSharp.Mat img)
+        private void Value_OnGrayImgChanged(LocalIntelProcSetting sender, OpenCvSharp.Mat input)
         {
+            var img = input.Clone();
             Window?.DispatcherQueue.TryEnqueue(() =>
             {
-                if (ImageSource2 == null)
+                if (ImageSource_Gray == null)
                 {
-                    ImageSource2 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                    ImageSource_Gray = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
                 }
-                else if (ImageSource2.PixelWidth != img.Width || ImageSource2.PixelHeight != img.Height)
+                else if (ImageSource_Gray.PixelWidth != img.Width || ImageSource_Gray.PixelHeight != img.Height)
                 {
-                    ImageSource2 = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                    ImageSource_Gray = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
                 }
-                ImageSource2.SetSource(img.ToMemoryStream().AsRandomAccessStream());
+                ImageSource_Gray.SetSource(img.ToMemoryStream().AsRandomAccessStream());
+            });
+        }
+        private void ProcSetting_OnEdgeImgChanged(LocalIntelProcSetting sender, OpenCvSharp.Mat input)
+        {
+            var img = input.Clone();
+            Window?.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (ImageSource_Edge == null)
+                {
+                    ImageSource_Edge = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                }
+                else if (ImageSource_Edge.PixelWidth != img.Width || ImageSource_Edge.PixelHeight != img.Height)
+                {
+                    ImageSource_Edge = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                }
+                ImageSource_Edge.SetSource(img.ToMemoryStream().AsRandomAccessStream());
             });
         }
         private void ClearImage()

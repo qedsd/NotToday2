@@ -112,12 +112,19 @@ namespace NotToday.Models
         {
             OnEdgeImgChanged?.Invoke(this, img);
         }
+        public void ChangeGrayImg(OpenCvSharp.Mat img)
+        {
+            OnGrayImgChanged?.Invoke(this, img);
+        }
         public void ChangeStandingRects(OpenCvSharp.Mat img, List<OpenCvSharp.Rect> rects)
         {
             OnStandingRectsChanged?.Invoke(this, img, rects);
         }
         public delegate void ScreenshotChangedDelegate(LocalIntelProcSetting sender, Bitmap img);
         public event ScreenshotChangedDelegate OnScreenshotChanged;
+
+        public delegate void GrayImgChangedDelegate(LocalIntelProcSetting sender, OpenCvSharp.Mat img);
+        public event GrayImgChangedDelegate OnGrayImgChanged;
 
         public delegate void EdgeImgChangedDelegate(LocalIntelProcSetting sender, OpenCvSharp.Mat img);
         public event EdgeImgChangedDelegate OnEdgeImgChanged;

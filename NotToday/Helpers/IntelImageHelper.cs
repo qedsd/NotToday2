@@ -31,15 +31,15 @@ namespace NotToday.Helpers
         }
         public static Mat GetGray(Mat input)
         {
-            Mat gray = new Mat();
-            Cv2.CvtColor(input, gray, ColorConversionCodes.RGB2GRAY);
+            Mat gray = Mat.Zeros(input.Rows, input.Cols, MatType.CV_8UC1);
+            Cv2.CvtColor(input, gray, ColorConversionCodes.BGR2GRAY);
             return gray;
         }
         public static Mat GetEdge(Mat input, int blurSizeW = 3, int blurSizeH = 3, int cannyThreshold1 = 100, int cannyThreshold2 = 100)
         {
-            Mat afterBlur = new Mat();
+            Mat afterBlur = Mat.Zeros(input.Rows, input.Cols, input.Type());
             Cv2.GaussianBlur(input, afterBlur, new Size(blurSizeW, blurSizeH), 0);
-            Mat afterCanny = new Mat();
+            Mat afterCanny = Mat.Zeros(afterBlur.Rows, afterBlur.Cols, afterBlur.Type());
             Cv2.Canny(afterBlur, afterCanny, cannyThreshold1, cannyThreshold2);
             afterBlur.Dispose();
             return afterCanny;
@@ -128,7 +128,7 @@ namespace NotToday.Helpers
                 }
             }
             //最后一个声望刚好没完全截取的情况下
-            if (foundStartLine && emptyLines < spanLine)
+            if (foundStartLine)
             {
                 if (lastFillRow - startRow >= minHeight)//只有矩形高在最小范围内才当作声望区域
                 {
@@ -346,6 +346,55 @@ namespace NotToday.Helpers
                 }
                 return points;
             }
+        }
+
+        public static Mat AddBrightness(Mat input, byte r, byte g, byte b)
+        {
+            Mat output = Mat.Zeros(input.Rows, input.Cols, input.Type());
+            for (int i = 0; i < input.Rows; i++)
+            {
+                for (int j = 0; j < input.Cols; j++)
+                {
+                    var p = input.At<Vec3b>(i, j);
+                    int bb = p.Item0;
+                    int gg = p.Item1;
+                    int rr = p.Item2;
+                    if (p.Item0 <= 255 - b)
+                    {
+                        bb = p.Item0 + b;
+                    }
+                    if (p.Item1 <= 255 - g)
+                    {
+                        gg = p.Item1 + g;
+                    }
+                    if (p.Item2 <= 255 - r)
+                    {
+                        rr = p.Item2 + r;
+                    }
+                    output.At<Vec3b>(i, j) = new Vec3b((byte)bb, (byte)gg, (byte)rr);
+                }
+            }
+            return output;
+        }
+
+        public static Mat ChangeRedTo(Mat input, byte targetR, byte targetG, byte targetB)
+        {
+            Mat output = input.Clone();
+            for (int i = 0; i < input.Rows; i++)
+            {
+                for (int j = 0; j < input.Cols; j++)
+                {
+                    var p = input.At<Vec3b>(i, j);
+                    int bb = p.Item0;
+                    int gg = p.Item1;
+                    int rr = p.Item2;
+                    if(Math.Abs(rr - gg) / (double)rr > 0.8 && Math.Abs(rr - bb) / (double)rr > 0.8)
+                    {
+                        output.At<Vec3b>(i, j) = new Vec3b(targetB, targetG, targetR);
+                    }
+                }
+            }
+            return output;
         }
     }
 }

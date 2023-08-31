@@ -59,7 +59,9 @@ namespace NotToday.Services
         private void Item_OnScreenshotChanged(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
         {
             var sourceMat = IntelImageHelper.BitmapToMat(img);
-            var grayMat = IntelImageHelper.GetGray(sourceMat);
+            var sourceMat2 = IntelImageHelper.ChangeRedTo(sourceMat, 100,100,100);
+            //sourceMat0.Dispose();
+            var grayMat = IntelImageHelper.GetGray(sourceMat2);
             var edgeMat = IntelImageHelper.GetEdge(grayMat, sender.AlgorithmParameter.BlurSizeW,
                 sender.AlgorithmParameter.BlurSizeH, sender.AlgorithmParameter.CannyThreshold1, sender.AlgorithmParameter.CannyThreshold2);
 
@@ -67,6 +69,7 @@ namespace NotToday.Services
                 sender.AlgorithmParameter.FillThresholdH, sender.AlgorithmParameter.SpanLineV,
                 sender.AlgorithmParameter.MinHeight, sender.AlgorithmParameter.MinWidth);
 
+            sender.ChangeGrayImg(grayMat);
             sender.ChangeEdgeImg(edgeMat);
             sender.ChangeStandingRects(sourceMat, rects);
             if (rects != null && rects.Any())
@@ -194,28 +197,19 @@ namespace NotToday.Services
                     throw new Exception($"LocalIntelService：未找到{sender.Name}的上一次声望记录");
                 }
             }
+            sourceMat.Dispose();
+            grayMat.Dispose();
+            edgeMat.Dispose();
         }
+        
         private bool IsMatch(System.Drawing.Color refColor, OpenCvSharp.Vec3b targetColor, double threshold = 0.2f)
         {
-            if ((double)Math.Abs(targetColor.Item0 - refColor.R) / (refColor.R == 0 ? 255 : refColor.R) < threshold)
+            ///Vec3b为BGR
+            if ((double)Math.Abs(targetColor.Item0 - refColor.B) / 255 < threshold)
             {
-                if ((double)Math.Abs(targetColor.Item1 - refColor.G) / (refColor.G == 0 ? 255 : refColor.G) < threshold)
+                if ((double)Math.Abs(targetColor.Item1 - refColor.G) / 255 < threshold)
                 {
-                    if ((double)Math.Abs(targetColor.Item2 - refColor.B) / (refColor.B == 0 ? 255 : refColor.B) < threshold)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        private bool IsMatch(OpenCvSharp.Vec3b refColor, OpenCvSharp.Vec3b targetColor, double threshold = 0.2f)
-        {
-            if ((double)Math.Abs(targetColor.Item0 - refColor.Item0) / (refColor.Item0 == 0 ? 255 : refColor.Item0) < threshold)
-            {
-                if ((double)Math.Abs(targetColor.Item1 - refColor.Item1) / (refColor.Item1 == 0 ? 255 : refColor.Item1) < threshold)
-                {
-                    if ((double)Math.Abs(targetColor.Item2 - refColor.Item2) / (refColor.Item2 == 0 ? 255 : refColor.Item2) < threshold)
+                    if ((double)Math.Abs(targetColor.Item2 - refColor.R) / 255 < threshold)
                     {
                         return true;
                     }
@@ -239,6 +233,7 @@ namespace NotToday.Services
                         stringBuilder.Append('+');
                     }
                     stringBuilder.Append(change.Change);
+                    stringBuilder.Append("  ");
                 }
             }
             var changedMsg = stringBuilder.ToString();
@@ -246,9 +241,9 @@ namespace NotToday.Services
             foreach (var change in standingChanges)
             {
                 stringBuilder.Append(change.Setting.Name);
-                stringBuilder.Append('：');
+                stringBuilder.Append(" : ");
                 stringBuilder.Append(change.Remain);
-                stringBuilder.Append(' ');
+                stringBuilder.Append("  ");
             }
             stringBuilder.Remove(stringBuilder.Length - 1, 1);
             var remainMsg = stringBuilder.ToString();
