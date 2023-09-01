@@ -93,6 +93,7 @@ namespace NotToday.Services
                             }
                         }
                     }
+                    sender.ChangeMatchRects(sourceMat, matchList);
                     if (lastStandings.Count == matchList.Count)//总匹配的声望和上一回一样，需要排除位置不同
                     {
                         for (int i = 0; i < lastStandings.Count; i++)

@@ -120,6 +120,10 @@ namespace NotToday.Models
         {
             OnStandingRectsChanged?.Invoke(this, img, rects);
         }
+        public void ChangeMatchRects(OpenCvSharp.Mat img, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>> matchList)
+        {
+            OnMatchRectsChanged?.Invoke(this, img, matchList);
+        }
         public delegate void ScreenshotChangedDelegate(LocalIntelProcSetting sender, Bitmap img);
         public event ScreenshotChangedDelegate OnScreenshotChanged;
 
@@ -131,6 +135,9 @@ namespace NotToday.Models
 
         public delegate void StandingRectsChangedDelegate(LocalIntelProcSetting sender, OpenCvSharp.Mat img, List<OpenCvSharp.Rect> rects);
         public event StandingRectsChangedDelegate OnStandingRectsChanged;
+
+        public delegate void MatchRectsChangedDelegate(LocalIntelProcSetting sender, OpenCvSharp.Mat img, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>> matchList);
+        public event MatchRectsChangedDelegate OnMatchRectsChanged;
     }
 
     public class LocalIntelStandingSetting : ObservableObject
@@ -254,7 +261,7 @@ namespace NotToday.Models
             set => SetProperty(ref mainColorSpan, value);
         }
 
-        private double colorMatchThreshold = 0.2;
+        private double colorMatchThreshold = 0.15;
         /// <summary>
         /// 声望RGB识别阈值百分比
         /// </summary>

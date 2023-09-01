@@ -56,6 +56,7 @@ namespace NotToday.ViewModels
                     procSetting.OnEdgeImgChanged -= ProcSetting_OnEdgeImgChanged;
                     procSetting.OnStandingRectsChanged -= ProcSetting_OnStandingRectsChanged;
                     value.OnGrayImgChanged -= Value_OnGrayImgChanged;
+                    value.OnMatchRectsChanged -= Value_OnMatchRectsChanged;
                 }
                 if (SetProperty(ref procSetting, value))
                 {
@@ -65,6 +66,7 @@ namespace NotToday.ViewModels
                         value.OnEdgeImgChanged += ProcSetting_OnEdgeImgChanged;
                         value.OnStandingRectsChanged += ProcSetting_OnStandingRectsChanged;
                         value.OnGrayImgChanged += Value_OnGrayImgChanged;
+                        value.OnMatchRectsChanged += Value_OnMatchRectsChanged;
                     }
                 }
             }
@@ -125,6 +127,16 @@ namespace NotToday.ViewModels
         {
             get => imageSource_Gray;
             set => SetProperty(ref imageSource_Gray, value);
+        }
+
+        private Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap imageSource_MatchRect;
+        /// <summary>
+        /// 声望匹配区域
+        /// </summary>
+        public Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap ImageSource_MatchRect
+        {
+            get => imageSource_MatchRect;
+            set => SetProperty(ref imageSource_MatchRect, value);
         }
 
         private int selectedThemeIndex = (int)ThemeSelectorService.Theme;
@@ -537,6 +549,25 @@ namespace NotToday.ViewModels
                     ImageSource_Edge = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
                 }
                 ImageSource_Edge.SetSource(img.ToMemoryStream().AsRandomAccessStream());
+            });
+        }
+        private void Value_OnMatchRectsChanged(LocalIntelProcSetting sender, OpenCvSharp.Mat input, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>> matchList)
+        {
+            var img2 = input.Clone();
+            var img = IntelImageHelper.DrawRects(img2, matchList);
+            img2.Dispose();
+            Window?.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (ImageSource_MatchRect == null)
+                {
+                    ImageSource_MatchRect = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                }
+                else if (ImageSource_MatchRect.PixelWidth != img.Width || ImageSource_MatchRect.PixelHeight != img.Height)
+                {
+                    ImageSource_MatchRect = new Microsoft.UI.Xaml.Media.Imaging.WriteableBitmap(img.Width, img.Height);
+                }
+                ImageSource_MatchRect.SetSource(img.ToMemoryStream().AsRandomAccessStream());
+                img.Dispose();
             });
         }
         private void ClearImage()

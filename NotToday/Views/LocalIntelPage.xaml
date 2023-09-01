@@ -485,6 +485,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Image
                     Grid.Column="0"
@@ -505,6 +506,10 @@
                 <Image
                     Grid.Column="4"
                     Source="{x:Bind VM.ImageSource_DrawRect, Mode=OneWay}"
+                    Stretch="Uniform" />
+                <Image
+                    Grid.Column="5"
+                    Source="{x:Bind VM.ImageSource_MatchRect, Mode=OneWay}"
                     Stretch="Uniform" />
             </Grid>
         </Grid>

@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using NotToday.Models;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -215,6 +216,26 @@ namespace NotToday.Helpers
                 foreach (var rect in rects)
                 {
                     var sourceVev3b = GetMainColor(rect, input, span);
+                    for (int i = rect.Top; i < rect.Bottom; i++)
+                    {
+                        for (int j = rect.Left; j < rect.Right; j++)
+                        {
+                            output.At<Vec3b>(i, j) = sourceVev3b;
+                        }
+                    }
+                }
+            }
+            return output;
+        }
+        public static Mat DrawRects(Mat input, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>> matchList)
+        {
+            Mat output = input.Clone();
+            if (matchList != null && matchList.Any())
+            {
+                foreach (var match in matchList)
+                {
+                    var rect = match.Item1;
+                    var sourceVev3b = new Vec3b(match.Item2.Color.B, match.Item2.Color.G, match.Item2.Color.R);
                     for (int i = rect.Top; i < rect.Bottom; i++)
                     {
                         for (int j = rect.Left; j < rect.Right; j++)
