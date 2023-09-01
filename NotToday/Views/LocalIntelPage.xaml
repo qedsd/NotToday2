@@ -257,7 +257,8 @@
                         <CheckBox
                             Grid.Row="2"
                             Content="{StaticResource LocalIntel_NotifyDecrease}"
-                            IsChecked="{x:Bind VM.ProcSetting.NotifyDecrease, Mode=TwoWay}" />
+                            IsChecked="{x:Bind VM.ProcSetting.NotifyDecrease, Mode=TwoWay}"
+                            Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                     </Grid>
                     <Grid Grid.Row="2" Margin="0,10">
                         <Grid.ColumnDefinitions>
@@ -372,10 +373,20 @@
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </Grid>
+                    <Grid Margin="0,10">
+                        <RadioButtons
+                            Header="{StaticResource LocalIntel_Mode}"
+                            MaxColumns="2"
+                            SelectedIndex="{x:Bind VM.ModeIndex, Mode=TwoWay}">
+                            <TextBlock Text="{StaticResource LocalIntel_Mode_PointRGB}" />
+                            <TextBlock Text="{StaticResource LocalIntel_Mode_RectRGB}" />
+                        </RadioButtons>
+                    </Grid>
                     <Button
                         Margin="10,10"
                         HorizontalAlignment="Center"
-                        Content="{StaticResource LocalIntel_AdvancedSettings}">
+                        Content="{StaticResource LocalIntel_AdvancedSettings}"
+                        Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}">
                         <Button.Flyout>
                             <Flyout>
                                 <StackPanel Margin="8">
@@ -424,10 +435,31 @@
                                         Minimum="0"
                                         Value="{x:Bind VM.ProcSetting.AlgorithmParameter.MainColorSpan, Mode=TwoWay}" />
                                     <NumberBox
+                                        Header="{StaticResource LocalIntel_Param_ColorMatchThreshold}"
+                                        Maximum="1"
+                                        Minimum="0.01"
+                                        Value="{x:Bind VM.ProcSetting.AlgorithmParameter.ColorMatchThreshold, Mode=TwoWay}" />
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button
+                        Margin="10,10"
+                        HorizontalAlignment="Center"
+                        Content="{StaticResource LocalIntel_AdvancedSettings}"
+                        Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource TrueToVisibleConverter}}">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel Margin="8">
+                                    <NumberBox
                                         x:Name="NumberBox_ColorMatchThreshold"
                                         Header="{StaticResource LocalIntel_Param_ColorMatchThreshold}"
                                         Minimum="0"
                                         Value="{x:Bind VM.ProcSetting.AlgorithmParameter.ColorMatchThreshold, Mode=TwoWay}" />
+                                    <NumberBox
+                                        Header="{StaticResource LocalIntel_Param_MinMatchPixel}"
+                                        Minimum="1"
+                                        Value="{x:Bind VM.ProcSetting.AlgorithmParameter.MinMatchPixel, Mode=TwoWay}" />
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>
@@ -494,23 +526,23 @@
                 <Image
                     Grid.Column="1"
                     Source="{x:Bind VM.ImageSource_Gray, Mode=OneWay}"
-                    Stretch="Uniform" />
+                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
                 <Image
                     Grid.Column="2"
                     Source="{x:Bind VM.ImageSource_Edge, Mode=OneWay}"
-                    Stretch="Uniform" />
+                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
                 <Image
                     Grid.Column="3"
                     Source="{x:Bind VM.ImageSource_DrawMainColorPos, Mode=OneWay}"
-                    Stretch="Uniform" />
+                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
                 <Image
                     Grid.Column="4"
                     Source="{x:Bind VM.ImageSource_DrawRect, Mode=OneWay}"
-                    Stretch="Uniform" />
+                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
                 <Image
                     Grid.Column="5"
                     Source="{x:Bind VM.ImageSource_MatchRect, Mode=OneWay}"
-                    Stretch="Uniform" />
+                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
             </Grid>
         </Grid>
     </Grid>

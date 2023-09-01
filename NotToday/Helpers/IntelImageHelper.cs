@@ -1,5 +1,6 @@
 ﻿using NotToday.Models;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -416,6 +417,30 @@ namespace NotToday.Helpers
                 }
             }
             return output;
+        }
+
+        public static List<Point> GetMatchPoint(Mat input, byte r, byte g, byte b, double threshold)
+        {
+            List<Point> points = new List<Point>();
+            for (int i = 0; i < input.Rows; i++)
+            {
+                for (int j = 0; j < input.Cols; j++)
+                {
+                    var targetColor = input.At<Vec3b>(i, j);
+                    ///Vec3b为BGR
+                    if ((double)Math.Abs(targetColor.Item0 - b) / 255 < threshold)
+                    {
+                        if ((double)Math.Abs(targetColor.Item1 - g) / 255 < threshold)
+                        {
+                            if ((double)Math.Abs(targetColor.Item2 - r) / 255 < threshold)
+                            {
+                                points.Add(new Point(j, i));
+                            }
+                        }
+                    }
+                }
+            }
+            return points;
         }
     }
 }

@@ -95,6 +95,8 @@ namespace NotToday.Models
             set => SetProperty(ref notifyDecrease, value);
         }
 
+        public LocalIntelMode LocalIntelMode { get; set; }
+
         private LocalIntelAlgorithmParameter algorithmParameter = new LocalIntelAlgorithmParameter();
         public LocalIntelAlgorithmParameter AlgorithmParameter
         {
@@ -270,6 +272,17 @@ namespace NotToday.Models
             get => colorMatchThreshold;
             set => SetProperty(ref colorMatchThreshold, value);
         }
+
+        private int minMatchPixel = 10;
+        /// <summary>
+        /// 最小匹配像素个数
+        /// PointRGB模式专用
+        /// </summary>
+        public int MinMatchPixel
+        {
+            get => minMatchPixel;
+            set => SetProperty(ref minMatchPixel, value);
+        }
     }
 
     public class LocalIntelNotify
@@ -287,5 +300,11 @@ namespace NotToday.Models
         public string ChangedMsg { get; set; }
         public string RemainMsg { get; set; }
         public DateTime Time { get; set; }
+    }
+
+    public enum LocalIntelMode
+    {
+        PointRGB = 0,
+        RectRGB = 1
     }
 }

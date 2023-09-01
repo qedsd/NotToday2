@@ -25,6 +25,7 @@ namespace NotToday.Services
             public int Remain;
         }
         private readonly Dictionary<string, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>>> _lastStandingsDic = new Dictionary<string, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>>>();
+        private readonly Dictionary<string, long[]> _lastPointRGBDic = new Dictionary<string, long[]>();
         public LocalIntelService()
         {
             _window = new LocalIntelNotifyWindow();
@@ -37,6 +38,7 @@ namespace NotToday.Services
         public void Remove(LocalIntelProcSetting item)
         {
             _lastStandingsDic.Remove(item.Name);
+            _lastPointRGBDic.Remove(item.Name);
             item.OnScreenshotChanged -= Item_OnScreenshotChanged;
             if (!_lastStandingsDic.Any())
             {
@@ -58,9 +60,76 @@ namespace NotToday.Services
         }
         private void Item_OnScreenshotChanged(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
         {
+            if(sender.LocalIntelMode == LocalIntelMode.PointRGB)
+            {
+                Analyse1(sender, img);
+            }
+            else
+            {
+                Analyse2(sender, img);
+            }
+        }
+
+        /// <summary>
+        /// PointRGB模式
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="img"></param>
+        /// <exception cref="Exception"></exception>
+        private void Analyse1(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
+        {
+            long[] lastSums;
+            if (_lastPointRGBDic.TryGetValue(sender.Name, out var value))
+            {
+                lastSums = value;
+            }
+            else
+            {
+                lastSums = new long[sender.StandingSettings.Count];
+            }
+            long[] curSums = new long[sender.StandingSettings.Count];
             var sourceMat = IntelImageHelper.BitmapToMat(img);
-            var sourceMat2 = IntelImageHelper.ChangeRedTo(sourceMat, 100,100,100);
-            //sourceMat0.Dispose();
+            for(int i = 0;i< sender.StandingSettings.Count; i++)
+            {
+                var setting = sender.StandingSettings[i];
+                var points = IntelImageHelper.GetMatchPoint(sourceMat, setting.Color.R, setting.Color.G, setting.Color.B, sender.AlgorithmParameter.ColorMatchThreshold);
+                long sum = 0;//使用每个点xy总和来记录，可能存在小概率误报
+                //foreach(var p in points)
+                //{
+                //    sum += p.X;
+                //    sum += p.Y;
+                //}
+                sum += points.Count;
+                curSums[i] = sum;
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int i = 0;i< lastSums.Length; i++)
+            {
+                if (Math.Abs(curSums[i] - lastSums[i]) >= sender.AlgorithmParameter.MinMatchPixel)
+                {
+                    stringBuilder.Append(sender.StandingSettings[i].Name);
+                    stringBuilder.Append("++");
+                    stringBuilder.Append("  ");
+                }
+            }
+            _lastPointRGBDic.Remove(sender.Name);
+            _lastPointRGBDic.Add(sender.Name, curSums);
+            if(stringBuilder.Length != 0)
+            {
+                SendNotify(sender, stringBuilder.ToString(), string.Empty);
+            }
+            sourceMat.Dispose();
+        }
+        /// <summary>
+        /// RectRGB模式
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="img"></param>
+        /// <exception cref="Exception"></exception>
+        private void Analyse2(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
+        {
+            var sourceMat = IntelImageHelper.BitmapToMat(img);
+            var sourceMat2 = IntelImageHelper.ChangeRedTo(sourceMat, 100, 100, 100);
             var grayMat = IntelImageHelper.GetGray(sourceMat2);
             var edgeMat = IntelImageHelper.GetEdge(grayMat, sender.AlgorithmParameter.BlurSizeW,
                 sender.AlgorithmParameter.BlurSizeH, sender.AlgorithmParameter.CannyThreshold1, sender.AlgorithmParameter.CannyThreshold2);
@@ -203,7 +272,7 @@ namespace NotToday.Services
             grayMat.Dispose();
             edgeMat.Dispose();
         }
-        
+
         private bool IsMatch(System.Drawing.Color refColor, OpenCvSharp.Vec3b targetColor, double threshold = 0.2f)
         {
             ///Vec3b为BGR

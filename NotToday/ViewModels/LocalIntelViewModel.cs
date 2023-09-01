@@ -67,8 +67,30 @@ namespace NotToday.ViewModels
                         value.OnStandingRectsChanged += ProcSetting_OnStandingRectsChanged;
                         value.OnGrayImgChanged += Value_OnGrayImgChanged;
                         value.OnMatchRectsChanged += Value_OnMatchRectsChanged;
+                        ModeIndex = (int)ProcSetting.LocalIntelMode;
                     }
                 }
+            }
+        }
+
+        private bool isPointRGBMode;
+        public bool IsPointRGBMode
+        {
+            get => isPointRGBMode;
+            set => SetProperty(ref isPointRGBMode, value);
+        }
+
+        private int modeIndex;
+        public int ModeIndex
+        {
+            get => modeIndex;
+            set
+            {
+                if(SetProperty(ref modeIndex, value))
+                {
+                    ProcSetting.LocalIntelMode = (LocalIntelMode)value;
+                }
+                IsPointRGBMode = value == 0;
             }
         }
 
