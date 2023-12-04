@@ -37,7 +37,6 @@ namespace NotToday.Services
         }
         private LocalIntelService()
         {
-            _window = new LocalIntelNotifyWindow();
         }
         public void Add(LocalIntelProcSetting item)
         {
@@ -70,7 +69,7 @@ namespace NotToday.Services
                 m.Dispose();
             }
             MediaSourceDic.Clear();
-            DefaultMediaSource?.Dispose();
+            defaultMediaSource?.Dispose();
             _window?.Dispose();
         }
         private void Item_OnScreenshotChanged(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
@@ -350,10 +349,21 @@ namespace NotToday.Services
             if (setting.SoundNotify)
                 SendSoundNotify(setting.HWnd, setting.Loop,setting.Volume, setting.SoundFile);
         }
-        private readonly LocalIntelNotifyWindow _window;
+        private LocalIntelNotifyWindow _window;
         private void SendWindowNotify(IntPtr hwnd, string name, string changedMsg, string remainMsg)
         {
-            _window.Add(new LocalIntelNotify(hwnd, name, changedMsg, remainMsg));
+            if(_window == null)
+            {
+                Helpers.WindowHelper.MainWindow.DispatcherQueue.TryEnqueue(() =>
+                {
+                    _window = new LocalIntelNotifyWindow();
+                    _window.Add(new LocalIntelNotify(hwnd, name, changedMsg, remainMsg));
+                });
+            }
+            else
+            {
+                _window.Add(new LocalIntelNotify(hwnd, name, changedMsg, remainMsg));
+            }
         }
 
         private async void SendToastNotify(IntPtr hwnd, string title, string changedMsg, string remainMsg)
