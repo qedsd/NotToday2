@@ -260,26 +260,83 @@
                             IsChecked="{x:Bind VM.ProcSetting.NotifyDecrease, Mode=TwoWay}"
                             Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                     </Grid>
-                    <Grid Grid.Row="2" Margin="0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="{StaticResource LocalIntel_IntelSound}" />
-                        <TextBox
-                            Grid.Column="1"
-                            Margin="4,0,0,0"
-                            HorizontalAlignment="Stretch"
-                            Text="{x:Bind VM.ProcSetting.SoundFile, Mode=TwoWay}" />
-                        <Button
-                            Grid.Column="2"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Command="{x:Bind VM.PickSoundFileCommand}">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE104;" />
-                        </Button>
+                    <Grid Grid.Row="1" Margin="0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Light"
+                            Text="{StaticResource LocalIntel_Sound_Setting}" />
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" Text="{StaticResource LocalIntel_IntelSound}" />
+                                <Grid Grid.Column="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        Margin="4,0,0,0"
+                                        HorizontalAlignment="Stretch"
+                                        PlaceholderText="{StaticResource LocalIntel_Sound_Default}"
+                                        Text="{x:Bind VM.ProcSetting.SoundFile, Mode=TwoWay}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Command="{x:Bind VM.PickSoundFileCommand}">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE104;" />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        Text="{StaticResource LocalIntel_Sound_Volume}" />
+                                    <Slider
+                                        Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Maximum="100"
+                                        Minimum="0"
+                                        SmallChange="1"
+                                        Value="{x:Bind VM.ProcSetting.Volume, Mode=TwoWay}" />
+                                </Grid>
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Width="80"
+                                    Margin="16,0,0,0"
+                                    Orientation="Horizontal">
+                                    <TextBlock
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Center"
+                                        Text="{StaticResource LocalIntel_Sound_Loop}" />
+                                    <CheckBox Margin="8,0,0,0" IsChecked="{x:Bind VM.ProcSetting.Loop, Mode=TwoWay}" />
+                                </StackPanel>
+
+                            </Grid>
+                        </Grid>
                     </Grid>
+
                     <Grid Margin="0,10">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -526,23 +583,28 @@
                 <Image
                     Grid.Column="1"
                     Source="{x:Bind VM.ImageSource_Gray, Mode=OneWay}"
-                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
+                    Stretch="Uniform"
+                    Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                 <Image
                     Grid.Column="2"
                     Source="{x:Bind VM.ImageSource_Edge, Mode=OneWay}"
-                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
+                    Stretch="Uniform"
+                    Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                 <Image
                     Grid.Column="3"
                     Source="{x:Bind VM.ImageSource_DrawMainColorPos, Mode=OneWay}"
-                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
+                    Stretch="Uniform"
+                    Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                 <Image
                     Grid.Column="4"
                     Source="{x:Bind VM.ImageSource_DrawRect, Mode=OneWay}"
-                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
+                    Stretch="Uniform"
+                    Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
                 <Image
                     Grid.Column="5"
                     Source="{x:Bind VM.ImageSource_MatchRect, Mode=OneWay}"
-                    Stretch="Uniform"  Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}"/>
+                    Stretch="Uniform"
+                    Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
             </Grid>
         </Grid>
     </Grid>

@@ -1,4 +1,5 @@
 ﻿using NotToday.Models;
+using NotToday.Services;
 using NotToday.Views;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace NotToday.Wins
         {
             args.Cancel = true;
             sender.Hide();
+            LocalIntelService.Current.StopSoundNotify();
         }
 
         public void ClearMsg()

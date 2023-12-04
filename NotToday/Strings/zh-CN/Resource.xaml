@@ -414,7 +414,7 @@
     <x:String x:Key="LocalIntel_Standing_Remove">删除</x:String>
     <x:String x:Key="LocalIntel_Standing_Add">新增监控声望</x:String>
     <x:String x:Key="LocalIntel_IntelText">预警通知内容</x:String>
-    <x:String x:Key="LocalIntel_IntelSound">预警通知声音</x:String>
+    <x:String x:Key="LocalIntel_IntelSound">音频文件</x:String>
     <x:String x:Key="LocalIntel_Rect">声望区域</x:String>
     <x:String x:Key="LocalIntel_NotifyMode">通知方式</x:String>
     <x:String x:Key="LocalIntel_NotifyMode_Toast">系统通知</x:String>
@@ -441,6 +441,10 @@
     <x:String x:Key="LocalIntel_Stop">停止</x:String>
     <x:String x:Key="LocalIntel_SelecteRect">选择区域</x:String>
     <x:String x:Key="LocalIntel_Mode">识别模式</x:String>
+    <x:String x:Key="LocalIntel_Sound_Setting">声音设置</x:String>
     <x:String x:Key="LocalIntel_Mode_PointRGB">模式1</x:String>
     <x:String x:Key="LocalIntel_Mode_RectRGB">模式2</x:String>
+    <x:String x:Key="LocalIntel_Sound_Loop">循环</x:String>
+    <x:String x:Key="LocalIntel_Sound_Volume">音量</x:String>
+    <x:String x:Key="LocalIntel_Sound_Default">默认</x:String>
 </ResourceDictionary>

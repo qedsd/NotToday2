@@ -26,7 +26,16 @@ namespace NotToday.Services
         }
         private readonly Dictionary<string, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>>> _lastStandingsDic = new Dictionary<string, List<Tuple<OpenCvSharp.Rect, LocalIntelStandingSetting>>>();
         private readonly Dictionary<string, long[]> _lastPointRGBDic = new Dictionary<string, long[]>();
-        public LocalIntelService()
+        private static LocalIntelService current;
+        public static LocalIntelService Current
+        {
+            get
+            {
+                current ??= new LocalIntelService();
+                return current;
+            }
+        }
+        private LocalIntelService()
         {
             _window = new LocalIntelNotifyWindow();
         }
@@ -40,6 +49,7 @@ namespace NotToday.Services
             _lastStandingsDic.Remove(item.Name);
             _lastPointRGBDic.Remove(item.Name);
             item.OnScreenshotChanged -= Item_OnScreenshotChanged;
+            RemoveMediaPlayer(item.HWnd);
             if (!_lastStandingsDic.Any())
             {
                 _window?.ClearMsg();
@@ -48,14 +58,19 @@ namespace NotToday.Services
         }
         public void Dispose()
         {
+            foreach(var player in MediaPlayers.Values)
+            {
+                player.Pause();
+                player.Source = null;
+                player.Dispose();
+            }
+            MediaPlayers.Clear();
             foreach (var m in MediaSourceDic.Values)
             {
                 m.Dispose();
             }
             MediaSourceDic.Clear();
             DefaultMediaSource?.Dispose();
-            DefaultMediaSource = null;
-            mediaPlayer?.Dispose();
             _window?.Dispose();
         }
         private void Item_OnScreenshotChanged(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
@@ -333,7 +348,7 @@ namespace NotToday.Services
             if (setting.ToastNotify)
                 SendToastNotify(setting.HWnd, name, changedMsg, remainMsg);
             if (setting.SoundNotify)
-                SendSoundNotify(setting.SoundFile);
+                SendSoundNotify(setting.HWnd, setting.Loop,setting.Volume, setting.SoundFile);
         }
         private readonly LocalIntelNotifyWindow _window;
         private void SendWindowNotify(IntPtr hwnd, string name, string changedMsg, string remainMsg)
@@ -347,50 +362,79 @@ namespace NotToday.Services
         }
 
         private Dictionary<string, MediaSource> MediaSourceDic = new Dictionary<string, MediaSource>();
-        private MediaSource DefaultMediaSource;
-        private MediaPlayer mediaPlayer;
-        private MediaPlayer MediaPlayer
+        private Dictionary<IntPtr, MediaPlayer> MediaPlayers = new Dictionary<IntPtr, MediaPlayer>();
+        private MediaSource defaultMediaSource;
+        private MediaSource DefaultMediaSource
         {
             get
             {
-                if (mediaPlayer == null)
+                if (defaultMediaSource == null)
                 {
-                    mediaPlayer = new MediaPlayer();
+                    defaultMediaSource = MediaSource.CreateFromUri(new Uri(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3")));
                 }
-                return mediaPlayer;
+                return defaultMediaSource;
             }
         }
-        private void SendSoundNotify(string filepath)
+        private void SendSoundNotify(IntPtr hwnd, bool loop, int volume, string filepath)
         {
-            MediaPlayer.Pause();
-            if (!string.IsNullOrEmpty(filepath))
+            MediaPlayer mediaPlayer;
+            if (!MediaPlayers.TryGetValue(hwnd, out mediaPlayer))
             {
-                if (MediaSourceDic.TryGetValue(filepath, out var mediaSourc))
+                filepath = string.IsNullOrEmpty(filepath) ?
+                System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3") :
+                filepath;
+                MediaSource mediaSource;
+                if (!MediaSourceDic.TryGetValue(filepath, out mediaSource))
                 {
-                    MediaPlayer.Source = mediaSourc;
-                }
-                else
-                {
-                    var m = MediaSource.CreateFromUri(new Uri(filepath));
-                    if (m != null)
+                    mediaSource = MediaSource.CreateFromUri(new Uri(filepath));
+                    if (mediaSource != null)
                     {
-                        MediaPlayer.Source = m;
-                        MediaSourceDic.Add(filepath, m);
+                        MediaSourceDic.Add(filepath, mediaSource);
+                    }
+                    else
+                    {
+                        Log.Error($"Create mediaSource from {filepath} return null");
                     }
                 }
-                MediaPlayer.Play();
+                mediaPlayer = new MediaPlayer()
+                {
+                    IsLoopingEnabled = loop,
+                    Source = mediaSource,
+                    Volume = volume / 100.0
+                };
+                MediaPlayers.Add(hwnd, mediaPlayer);
             }
-            else
+            
+            mediaPlayer.Pause();
+            mediaPlayer.Position = TimeSpan.Zero;
+            mediaPlayer.Play();
+        }
+
+        public void StopSoundNotify(IntPtr hwnd)
+        {
+            if (MediaPlayers.TryGetValue(hwnd, out var mediaPlayer))
             {
-                if (DefaultMediaSource == null)
-                {
-                    DefaultMediaSource = MediaSource.CreateFromUri(new Uri(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3")));
-                }
-                if (DefaultMediaSource != null)
-                {
-                    MediaPlayer.Source = DefaultMediaSource;
-                    MediaPlayer.Play();
-                }
+                mediaPlayer.Pause();
+                mediaPlayer.Position = TimeSpan.Zero;
+            }
+        }
+        public void StopSoundNotify()
+        {
+            foreach(var mediaPlayer in MediaPlayers.Values)
+            {
+                mediaPlayer.Pause();
+                mediaPlayer.Position = TimeSpan.Zero;
+            }
+        }
+        private void RemoveMediaPlayer(IntPtr hwnd)
+        {
+            if (MediaPlayers.TryGetValue(hwnd, out var mediaPlayer))
+            {
+                mediaPlayer.Pause();
+                mediaPlayer.Position = TimeSpan.Zero;
+                mediaPlayer.Source = null;
+                mediaPlayer.Dispose();
+                MediaPlayers.Remove(hwnd);
             }
         }
         #endregion

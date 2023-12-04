@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NotToday.Services;
 
 namespace NotToday.Notifications
 {
@@ -35,6 +36,7 @@ namespace NotToday.Notifications
                 if (hwnd != IntPtr.Zero)
                 {
                     Helpers.WindowHelper.SetForegroundWindow_Click(hwnd);
+                    LocalIntelService.Current.StopSoundNotify(hwnd);
                 }
             }
         }

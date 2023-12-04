@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using NotToday.Models;
+using NotToday.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +39,7 @@ namespace NotToday.Views
             if (data != null)
             {
                 Helpers.WindowHelper.SetForegroundWindow_Click(data.HWnd);
+                LocalIntelService.Current.StopSoundNotify(data.HWnd);
             }
         }
 

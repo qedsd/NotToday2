@@ -95,6 +95,20 @@ namespace NotToday.Models
             set => SetProperty(ref notifyDecrease, value);
         }
 
+        private bool loop = true;
+        public bool Loop
+        {
+            get => loop;
+            set => SetProperty(ref loop, value);
+        }
+
+        private int volume = 100;
+        public int Volume
+        {
+            get => volume;
+            set => SetProperty(ref volume, value);
+        }
+
         public LocalIntelMode LocalIntelMode { get; set; }
 
         private LocalIntelAlgorithmParameter algorithmParameter = new LocalIntelAlgorithmParameter();

@@ -20,7 +20,6 @@ namespace NotToday.ViewModels
 {
     public class LocalIntelViewModel : BaseViewModel
     {
-        private Services.LocalIntelService _localIntelService = new Services.LocalIntelService();
         private ObservableCollection<ProcessInfo> processes = new ObservableCollection<ProcessInfo>();
         public ObservableCollection<ProcessInfo> Processes
         {
@@ -430,7 +429,7 @@ namespace NotToday.ViewModels
                         if (_localIntelWindow.Add(setting))
                         {
                             _runningDic.Add(setting.Name, setting);
-                            _localIntelService.Add(setting);
+                            LocalIntelService.Current.Add(setting);
                             target.Running = true;
                             Running = true;
                             return true;
@@ -471,7 +470,7 @@ namespace NotToday.ViewModels
             if (_localIntelWindow.Remve(setting))
             {
                 _runningDic.Remove(setting.Name);
-                _localIntelService.Remove(setting);
+                LocalIntelService.Current.Remove(setting);
                 var target = Processes.FirstOrDefault(p => p.WindowTitle == setting.Name);
                 if (target != null)
                 {
@@ -599,7 +598,7 @@ namespace NotToday.ViewModels
         public void Dispose()
         {
             _localIntelWindow?.Close();
-            _localIntelService.Dispose();
+            LocalIntelService.Current.Dispose();
         }
     }
 }
