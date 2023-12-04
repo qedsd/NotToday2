@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -76,21 +77,42 @@ namespace NotToday.Services
         {
             if(sender.LocalIntelMode == LocalIntelMode.PointRGB)
             {
-                Analyse1(sender, img);
+                if(sender.Delay > 0)
+                {
+                    Analyse1_2(sender, img);
+                }
+                else
+                {
+                    Analyse1_1(sender, img);
+                }
             }
             else
             {
                 Analyse2(sender, img);
             }
         }
-
+        private long[] Analyse1_FindCurSums(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
+        {
+            long[] curSums = new long[sender.StandingSettings.Count];
+            var sourceMat = IntelImageHelper.BitmapToMat(img);
+            for (int i = 0; i < sender.StandingSettings.Count; i++)
+            {
+                var setting = sender.StandingSettings[i];
+                var points = IntelImageHelper.GetMatchPoint(sourceMat, setting.Color.R, setting.Color.G, setting.Color.B, sender.AlgorithmParameter.ColorMatchThreshold);
+                long sum = 0;//使用每个点xy总和来记录，可能存在小概率误报
+                sum += points.Count;
+                curSums[i] = sum;
+            }
+            sourceMat.Dispose();
+            return curSums;
+        }
         /// <summary>
-        /// PointRGB模式
+        /// PointRGB模式，不启用延迟
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="img"></param>
         /// <exception cref="Exception"></exception>
-        private void Analyse1(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
+        private void Analyse1_1(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
         {
             long[] lastSums;
             if (_lastPointRGBDic.TryGetValue(sender.Name, out var value))
@@ -101,21 +123,7 @@ namespace NotToday.Services
             {
                 lastSums = new long[sender.StandingSettings.Count];
             }
-            long[] curSums = new long[sender.StandingSettings.Count];
-            var sourceMat = IntelImageHelper.BitmapToMat(img);
-            for(int i = 0;i< sender.StandingSettings.Count; i++)
-            {
-                var setting = sender.StandingSettings[i];
-                var points = IntelImageHelper.GetMatchPoint(sourceMat, setting.Color.R, setting.Color.G, setting.Color.B, sender.AlgorithmParameter.ColorMatchThreshold);
-                long sum = 0;//使用每个点xy总和来记录，可能存在小概率误报
-                //foreach(var p in points)
-                //{
-                //    sum += p.X;
-                //    sum += p.Y;
-                //}
-                sum += points.Count;
-                curSums[i] = sum;
-            }
+            var curSums = Analyse1_FindCurSums(sender, img);
             StringBuilder stringBuilder = new StringBuilder();
             for(int i = 0;i< lastSums.Length; i++)
             {
@@ -132,8 +140,43 @@ namespace NotToday.Services
             {
                 SendNotify(sender, stringBuilder.ToString(), string.Empty);
             }
-            sourceMat.Dispose();
         }
+        private Timer _pointRGBTimer;
+        /// <summary>
+        /// PointRGB模式，启用延迟
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="img"></param>
+        private void Analyse1_2(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
+        {
+            long[] lastSums;
+            if (_lastPointRGBDic.TryGetValue(sender.Name, out var value))
+            {
+                lastSums = value;
+            }
+            else
+            {
+                lastSums = new long[sender.StandingSettings.Count];
+            }
+            var curSums = Analyse1_FindCurSums(sender, img);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < lastSums.Length; i++)
+            {
+                if (Math.Abs(curSums[i] - lastSums[i]) >= sender.AlgorithmParameter.MinMatchPixel)
+                {
+                    stringBuilder.Append(sender.StandingSettings[i].Name);
+                    stringBuilder.Append("++");
+                    stringBuilder.Append("  ");
+                }
+            }
+            _lastPointRGBDic.Remove(sender.Name);
+            _lastPointRGBDic.Add(sender.Name, curSums);
+            if (stringBuilder.Length != 0)
+            {
+                SendNotify(sender, stringBuilder.ToString(), string.Empty);
+            }
+        }
+
         /// <summary>
         /// RectRGB模式
         /// </summary>

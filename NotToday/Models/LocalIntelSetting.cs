@@ -109,6 +109,13 @@ namespace NotToday.Models
             set => SetProperty(ref volume, value);
         }
 
+        private int delay = 0;
+        public int Delay
+        {
+            get => delay;
+            set => SetProperty(ref delay, value);
+        }
+
         public LocalIntelMode LocalIntelMode { get; set; }
 
         private LocalIntelAlgorithmParameter algorithmParameter = new LocalIntelAlgorithmParameter();
