@@ -52,13 +52,13 @@ namespace NotToday.Models
                     {
                         stringBuilder.Append(Setting.StandingSettings[i].Name);
                         stringBuilder.Append("++");
-                        stringBuilder.Append("  ");
+                        stringBuilder.Append($"({diff})");
                     }
                     else if (Setting.NotifyDecrease)
                     {
                         stringBuilder.Append(Setting.StandingSettings[i].Name);
                         stringBuilder.Append("--");
-                        stringBuilder.Append("  ");
+                        stringBuilder.Append($"({diff})");
                     }
                 }
             }
