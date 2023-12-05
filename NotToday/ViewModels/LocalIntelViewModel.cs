@@ -54,8 +54,8 @@ namespace NotToday.ViewModels
                     procSetting.OnScreenshotChanged -= ProcSetting_OnScreenshotChanged;
                     procSetting.OnEdgeImgChanged -= ProcSetting_OnEdgeImgChanged;
                     procSetting.OnStandingRectsChanged -= ProcSetting_OnStandingRectsChanged;
-                    value.OnGrayImgChanged -= Value_OnGrayImgChanged;
-                    value.OnMatchRectsChanged -= Value_OnMatchRectsChanged;
+                    procSetting.OnGrayImgChanged -= Value_OnGrayImgChanged;
+                    procSetting.OnMatchRectsChanged -= Value_OnMatchRectsChanged;
                 }
                 if (SetProperty(ref procSetting, value))
                 {

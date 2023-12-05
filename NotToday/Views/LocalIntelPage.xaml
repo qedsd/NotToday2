@@ -137,6 +137,8 @@
                                     <NumberBox
                                         Header="{StaticResource LocalIntel_RefreshSpan}"
                                         Minimum="50"
+                                        SmallChange="10"
+                                        SpinButtonPlacementMode="Compact"
                                         Value="{x:Bind VM.Setting.RefreshSpan, Mode=TwoWay}" />
                                 </Grid>
                                 <Grid Margin="0,8">
@@ -520,6 +522,17 @@
                                         Header="{StaticResource LocalIntel_Param_MinMatchPixel}"
                                         Minimum="1"
                                         Value="{x:Bind VM.ProcSetting.AlgorithmParameter.MinMatchPixel, Mode=TwoWay}" />
+                                    <CheckBox
+                                        Margin="0,4"
+                                        Content="{StaticResource LocalIntel_Param_IsDelay}"
+                                        IsChecked="{x:Bind VM.ProcSetting.AlgorithmParameter.IsDelay, Mode=TwoWay}" />
+                                    <NumberBox
+                                        Header="{StaticResource LocalIntel_Param_Delay}"
+                                        Minimum="200"
+                                        SmallChange="1"
+                                        SpinButtonPlacementMode="Inline"
+                                        Visibility="{x:Bind VM.ProcSetting.AlgorithmParameter.IsDelay, Mode=OneWay, Converter={StaticResource TrueToVisibleConverter}}"
+                                        Value="{x:Bind VM.ProcSetting.AlgorithmParameter.Delay, Mode=TwoWay}" />
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>

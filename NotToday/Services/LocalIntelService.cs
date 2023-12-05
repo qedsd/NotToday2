@@ -4,6 +4,7 @@ using NotToday.Notifications;
 using NotToday.Wins;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,9 +18,9 @@ namespace NotToday.Services
     /// 用于计算声望变化和发出通知
     /// 每个LocalIntelPage对应一个service
     /// </summary>
-    internal class LocalIntelService
+    public class LocalIntelService
     {
-        class StandingChange
+        public class StandingChange
         {
             public LocalIntelStandingSetting Setting;
             public int Change;
@@ -48,6 +49,11 @@ namespace NotToday.Services
         {
             _lastStandingsDic.Remove(item.Name);
             _lastPointRGBDic.Remove(item.Name);
+            if(_pointRGBDelays.TryGetValue(item.HWnd, out var delay))
+            {
+                delay.Dispose();
+                _pointRGBDelays.Remove(item.HWnd);
+            }
             item.OnScreenshotChanged -= Item_OnScreenshotChanged;
             RemoveMediaPlayer(item.HWnd);
             if (!_lastStandingsDic.Any())
@@ -70,14 +76,18 @@ namespace NotToday.Services
                 m.Dispose();
             }
             MediaSourceDic.Clear();
-            defaultMediaSource?.Dispose();
+            foreach(var delay in _pointRGBDelays.Values)
+            {
+                delay.Dispose();
+            }
+            _pointRGBDelays.Clear();
             _window?.Dispose();
         }
         private void Item_OnScreenshotChanged(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
         {
             if(sender.LocalIntelMode == LocalIntelMode.PointRGB)
             {
-                if(sender.Delay > 0)
+                if(sender.AlgorithmParameter.IsDelay)
                 {
                     Analyse1_2(sender, img);
                 }
@@ -141,7 +151,7 @@ namespace NotToday.Services
                 SendNotify(sender, stringBuilder.ToString(), string.Empty);
             }
         }
-        private Timer _pointRGBTimer;
+        private readonly Dictionary<IntPtr, PointRGBDelayModel> _pointRGBDelays = new Dictionary<IntPtr, PointRGBDelayModel>();
         /// <summary>
         /// PointRGB模式，启用延迟
         /// </summary>
@@ -149,33 +159,18 @@ namespace NotToday.Services
         /// <param name="img"></param>
         private void Analyse1_2(LocalIntelProcSetting sender, System.Drawing.Bitmap img)
         {
-            long[] lastSums;
-            if (_lastPointRGBDic.TryGetValue(sender.Name, out var value))
+            PointRGBDelayModel pointRGBDelay;
+            if (!_pointRGBDelays.TryGetValue(sender.HWnd, out pointRGBDelay))
             {
-                lastSums = value;
-            }
-            else
-            {
-                lastSums = new long[sender.StandingSettings.Count];
+                pointRGBDelay = new PointRGBDelayModel(sender.HWnd, sender);
+                pointRGBDelay.LastSums = new long[sender.StandingSettings.Count];
+                pointRGBDelay.CurSums = pointRGBDelay.LastSums;
+                _pointRGBDelays.Add(sender.HWnd, pointRGBDelay);
             }
             var curSums = Analyse1_FindCurSums(sender, img);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < lastSums.Length; i++)
-            {
-                if (Math.Abs(curSums[i] - lastSums[i]) >= sender.AlgorithmParameter.MinMatchPixel)
-                {
-                    stringBuilder.Append(sender.StandingSettings[i].Name);
-                    stringBuilder.Append("++");
-                    stringBuilder.Append("  ");
-                }
-            }
-            _lastPointRGBDic.Remove(sender.Name);
-            _lastPointRGBDic.Add(sender.Name, curSums);
-            if (stringBuilder.Length != 0)
-            {
-                SendNotify(sender, stringBuilder.ToString(), string.Empty);
-            }
+            pointRGBDelay.UpdateCurSums(curSums);
         }
+
 
         /// <summary>
         /// RectRGB模式
@@ -348,7 +343,7 @@ namespace NotToday.Services
 
 
         #region 通知
-        private void SendNotify(LocalIntelProcSetting setting, List<StandingChange> standingChanges)
+        public void SendNotify(LocalIntelProcSetting setting, List<StandingChange> standingChanges)
         {
             StringBuilder stringBuilder = new StringBuilder();
             foreach (var change in standingChanges)
@@ -377,7 +372,7 @@ namespace NotToday.Services
             var remainMsg = stringBuilder.ToString();
             SendNotify(setting, changedMsg, remainMsg);
         }
-        private void SendNotify(LocalIntelProcSetting setting, string changedMsg, string remainMsg)
+        public void SendNotify(LocalIntelProcSetting setting, string changedMsg, string remainMsg)
         {
             string name = setting.Name;
             if (name.Contains('-'))
@@ -416,18 +411,6 @@ namespace NotToday.Services
 
         private Dictionary<string, MediaSource> MediaSourceDic = new Dictionary<string, MediaSource>();
         private Dictionary<IntPtr, MediaPlayer> MediaPlayers = new Dictionary<IntPtr, MediaPlayer>();
-        private MediaSource defaultMediaSource;
-        private MediaSource DefaultMediaSource
-        {
-            get
-            {
-                if (defaultMediaSource == null)
-                {
-                    defaultMediaSource = MediaSource.CreateFromUri(new Uri(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3")));
-                }
-                return defaultMediaSource;
-            }
-        }
         private void SendSoundNotify(IntPtr hwnd, bool loop, int volume, string filepath)
         {
             MediaPlayer mediaPlayer;

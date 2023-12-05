@@ -109,13 +109,6 @@ namespace NotToday.Models
             set => SetProperty(ref volume, value);
         }
 
-        private int delay = 0;
-        public int Delay
-        {
-            get => delay;
-            set => SetProperty(ref delay, value);
-        }
-
         public LocalIntelMode LocalIntelMode { get; set; }
 
         private LocalIntelAlgorithmParameter algorithmParameter = new LocalIntelAlgorithmParameter();
@@ -303,6 +296,20 @@ namespace NotToday.Models
         {
             get => minMatchPixel;
             set => SetProperty(ref minMatchPixel, value);
+        }
+
+        private bool isDelay = true;
+        public bool IsDelay
+        {
+            get => isDelay;
+            set => SetProperty(ref isDelay, value);
+        }
+
+        private int delay = 500;
+        public int Delay
+        {
+            get => delay;
+            set => SetProperty(ref delay, value);
         }
     }
 
