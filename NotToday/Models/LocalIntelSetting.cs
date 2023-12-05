@@ -298,7 +298,7 @@ namespace NotToday.Models
             set => SetProperty(ref minMatchPixel, value);
         }
 
-        private bool isDelay = true;
+        private bool isDelay = false;
         public bool IsDelay
         {
             get => isDelay;
