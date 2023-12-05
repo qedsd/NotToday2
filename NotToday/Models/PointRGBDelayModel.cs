@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,11 +44,22 @@ namespace NotToday.Models
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < LastSums.Length; i++)
             {
-                if (Math.Abs(CurSums[i] - LastSums[i]) >= Setting.AlgorithmParameter.MinMatchPixel)
+                long diff = CurSums[i] - LastSums[i];
+                if (Math.Abs(diff) >= Setting.AlgorithmParameter.MinMatchPixel)
                 {
-                    stringBuilder.Append(Setting.StandingSettings[i].Name);
-                    stringBuilder.Append("++");
-                    stringBuilder.Append("  ");
+                    Debug.WriteLine($"{CurSums[i]} {LastSums[i]}");
+                    if (diff > 0)
+                    {
+                        stringBuilder.Append(Setting.StandingSettings[i].Name);
+                        stringBuilder.Append("++");
+                        stringBuilder.Append("  ");
+                    }
+                    else if (Setting.NotifyDecrease)
+                    {
+                        stringBuilder.Append(Setting.StandingSettings[i].Name);
+                        stringBuilder.Append("--");
+                        stringBuilder.Append("  ");
+                    }
                 }
             }
             LastSums = CurSums;

@@ -259,8 +259,7 @@
                         <CheckBox
                             Grid.Row="2"
                             Content="{StaticResource LocalIntel_NotifyDecrease}"
-                            IsChecked="{x:Bind VM.ProcSetting.NotifyDecrease, Mode=TwoWay}"
-                            Visibility="{x:Bind VM.IsPointRGBMode, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
+                            IsChecked="{x:Bind VM.ProcSetting.NotifyDecrease, Mode=TwoWay}" />
                     </Grid>
                     <Grid
                         Grid.Row="1"

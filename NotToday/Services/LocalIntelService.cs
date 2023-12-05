@@ -137,11 +137,21 @@ namespace NotToday.Services
             StringBuilder stringBuilder = new StringBuilder();
             for(int i = 0;i< lastSums.Length; i++)
             {
-                if (Math.Abs(curSums[i] - lastSums[i]) >= sender.AlgorithmParameter.MinMatchPixel)
+                long diff = curSums[i] - lastSums[i];
+                if (Math.Abs(diff) >= sender.AlgorithmParameter.MinMatchPixel)
                 {
-                    stringBuilder.Append(sender.StandingSettings[i].Name);
-                    stringBuilder.Append("++");
-                    stringBuilder.Append("  ");
+                    if(diff > 0)
+                    {
+                        stringBuilder.Append(sender.StandingSettings[i].Name);
+                        stringBuilder.Append("++");
+                        stringBuilder.Append("  ");
+                    }
+                    else if(sender.NotifyDecrease)
+                    {
+                        stringBuilder.Append(sender.StandingSettings[i].Name);
+                        stringBuilder.Append("--");
+                        stringBuilder.Append("  ");
+                    }
                 }
             }
             _lastPointRGBDic.Remove(sender.Name);
