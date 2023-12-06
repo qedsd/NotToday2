@@ -318,6 +318,10 @@ namespace NotToday.ViewModels
         {
             Stop(ProcSetting);
         });
+        public ICommand MuteCommand => new RelayCommand(() =>
+        {
+            Services.LocalIntelService.Current.StopSoundNotify(ProcSetting.HWnd);
+        });
 
         public ICommand StartAllCommand => new RelayCommand(() =>
         {

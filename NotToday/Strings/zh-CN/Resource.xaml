@@ -439,6 +439,7 @@
     <x:String x:Key="LocalIntel_RefreshProcessList">刷新列表</x:String>
     <x:String x:Key="LocalIntel_Start">开始</x:String>
     <x:String x:Key="LocalIntel_Stop">停止</x:String>
+    <x:String x:Key="LocalIntel_Mute">静音</x:String>
     <x:String x:Key="LocalIntel_SelecteRect">选择区域</x:String>
     <x:String x:Key="LocalIntel_Mode">识别模式</x:String>
     <x:String x:Key="LocalIntel_Sound_Setting">声音设置</x:String>

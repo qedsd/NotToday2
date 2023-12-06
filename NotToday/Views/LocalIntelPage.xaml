@@ -574,6 +574,12 @@
                         Icon="Edit"
                         Label="{StaticResource LocalIntel_SelecteRect}"
                         Visibility="{x:Bind VM.SelectedProcess.Running, Mode=OneWay, Converter={StaticResource FalseToVisibleConverter}}" />
+                    <AppBarButton
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind VM.MuteCommand}"
+                        Icon="Mute"
+                        Label="{StaticResource LocalIntel_Mute}"
+                        Visibility="{x:Bind VM.SelectedProcess.Running, Mode=OneWay, Converter={StaticResource TrueToVisibleConverter}}" />
                 </StackPanel>
             </Grid>
         </Grid>
