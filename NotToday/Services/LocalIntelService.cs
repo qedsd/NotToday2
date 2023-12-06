@@ -144,15 +144,15 @@ namespace NotToday.Services
                     {
                         stringBuilder.Append(sender.StandingSettings[i].Name);
                         stringBuilder.Append("++");
-                        stringBuilder.Append("  ");
                         stringBuilder.Append($"({diff})");
+                        stringBuilder.Append("  ");
                     }
                     else if(sender.NotifyDecrease)
                     {
                         stringBuilder.Append(sender.StandingSettings[i].Name);
                         stringBuilder.Append("--");
-                        stringBuilder.Append("  ");
                         stringBuilder.Append($"({diff})");
+                        stringBuilder.Append("  ");
                     }
                 }
             }
