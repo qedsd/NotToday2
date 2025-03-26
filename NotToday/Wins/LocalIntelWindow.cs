@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using NotToday.Helpers;
 using NotToday.Models;
 using System;
@@ -42,6 +43,12 @@ namespace NotToday.Wins
             Helpers.WindowHelper.TopMost(this);
             _appWindow.IsShownInSwitchers = false;
             EnableRightMouseMove();
+            this.Closed += LocalIntelWindow_Closed;
+        }
+
+        private void LocalIntelWindow_Closed(object sender, WindowEventArgs args)
+        {
+            Log.Error("Intel Window Closed");
         }
         #region 鼠标右键移动窗口
         private System.Timers.Timer _pointerTimer;
@@ -161,8 +168,8 @@ namespace NotToday.Wins
                 else
                 {
                     //没有监控则关闭窗口
-                    Close();
                     StopScreenshot();
+                    Close();
                 }
                 return true;
             }
@@ -189,22 +196,30 @@ namespace NotToday.Wins
         #endregion
 
         #region 定期截图
+        private object Locker = new object();
         private bool _stopScreenshot = true;
         private void StartScreenshot()
         {
-            if (!_stopScreenshot)
+            lock (Locker)
             {
-                return;
+                if (!_stopScreenshot)
+                {
+                    return;
+                }
+                _stopScreenshot = false;
             }
-            _stopScreenshot = false;
             Task.Run(() =>
             {
                 while (true)
                 {
-                    if (_stopScreenshot)
+                    lock (Locker)
                     {
-                        return;
+                        if (_stopScreenshot)
+                        {
+                            return;
+                        }
                     }
+                        
                     try
                     {
                         System.Drawing.Point point = new System.Drawing.Point();
@@ -223,18 +238,31 @@ namespace NotToday.Wins
                             }
                             img.Dispose();
                         }
-                        Thread.Sleep(_refreshSpan);
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex);
+                        StopScreenshot();
+                        this.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            Window window = new Window();
+                            window.Content = new Microsoft.UI.Xaml.Controls.TextBlock() { Text = ex.ToString() };
+                            window.Activate();
+                        });
+                    }
+                    finally
+                    {
+                        Thread.Sleep(_refreshSpan);
                     }
                 }
             });
         }
         private void StopScreenshot()
         {
-            _stopScreenshot = true;
+            lock (Locker)
+            {
+                _stopScreenshot = true;
+            } 
         }
         #endregion
     }

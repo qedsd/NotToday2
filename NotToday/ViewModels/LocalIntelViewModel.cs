@@ -206,10 +206,18 @@ namespace NotToday.ViewModels
             if (allProcesses != null && allProcesses.Any())
             {
                 List<ProcessInfo> targetProcesses = new List<ProcessInfo>();
-                //获取所有目标进程
                 await Task.Run(() =>
                 {
-                    foreach (var process in allProcesses.Where(p => p.ProcessName == Setting.ProcessName).ToList())
+                    List<Process> processes;
+                    if (!string.IsNullOrEmpty(Setting.ProcessName))
+                    {
+                        processes = allProcesses.Where(p => p.ProcessName == Setting.ProcessName).ToList();
+                    }
+                    else
+                    {
+                        processes = allProcesses.ToList();
+                    }
+                    foreach (var process in processes)
                     {
                         if (process.MainWindowHandle != IntPtr.Zero)
                         {
@@ -224,6 +232,8 @@ namespace NotToday.ViewModels
                         }
                     }
                 });
+                //获取所有目标进程
+
                 if (targetProcesses != null && targetProcesses.Any())
                 {
                     List<ProcessInfo> targetProcessesForShow;//最终要显示的目标进程
