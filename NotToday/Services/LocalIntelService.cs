@@ -158,7 +158,15 @@ namespace NotToday.Services
             }
             _lastPointRGBDic.Remove(sender.Name);
             _lastPointRGBDic.Add(sender.Name, curSums);
-            if(stringBuilder.Length != 0)
+            ////红++(129)  白++(1581) 
+            //stringBuilder.Clear();
+            //Random random = new Random();
+            //var ran = random.Next(5);
+            //if(ran == 1)
+            //{
+            //    stringBuilder.Append("红++(129)  白++(1581) ");
+            //}
+            if (stringBuilder.Length != 0)
             {
                 SendNotify(sender, stringBuilder.ToString(), string.Empty);
             }

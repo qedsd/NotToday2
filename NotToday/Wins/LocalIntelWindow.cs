@@ -75,7 +75,7 @@ namespace NotToday.Wins
         private void MainUIElement_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             MainUIElement.PointerReleased -= MainUIElement_PointerReleased;
-            StartScreenshot();
+            Start();
             _pointerTimer.Stop();
         }
 
@@ -84,7 +84,7 @@ namespace NotToday.Wins
             if (e.GetCurrentPoint(sender as UIElement).Properties.IsRightButtonPressed)
             {
                 MainUIElement.PointerReleased += MainUIElement_PointerReleased;
-                StopScreenshot();
+                Stop();
                 System.Drawing.Point lpPoint = new System.Drawing.Point();
                 Win32.GetCursorPos(ref lpPoint);
                 xOffset = lpPoint.X - _appWindow.Position.X - _appWindow.Size.Width / 2;
@@ -95,6 +95,10 @@ namespace NotToday.Wins
         #endregion
 
         public bool Add(LocalIntelProcSetting procSetting)
+        {
+            return TryAdd(procSetting);
+        }
+        private bool TryAdd(LocalIntelProcSetting procSetting)
         {
             if (!_intelDics.ContainsKey(procSetting.Name))
             {
@@ -118,7 +122,6 @@ namespace NotToday.Wins
                         _intelDics.Add(procSetting.Name, newItem);
                         _appWindow.Resize(new Windows.Graphics.SizeInt32(newItem.ThumbRect.Right, _intelDics.Max(p => p.Value.ThumbRect.Bottom)));
                         UpdateThumb(thumbHWdn, newItem.ThumbRect, new WindowCaptureHelper.Rect(procSetting.X + widthMargin, procSetting.Y, procSetting.X + procSetting.Width + widthMargin, procSetting.Y + procSetting.Height));
-                        StartScreenshot();
                         return true;
                     }
                     else
@@ -138,10 +141,12 @@ namespace NotToday.Wins
                 return false;
             }
         }
+
         public bool Remve(LocalIntelProcSetting procSetting)
         {
             if (_intelDics.TryGetValue(procSetting?.Name, out LocalIntelWindowItem newItem))
             {
+                Stop();
                 UnRegisterThumb(newItem.ThumbHWnd);
                 _intelDics.Remove(procSetting.Name);
                 if (_intelDics.Count > 0)
@@ -164,11 +169,11 @@ namespace NotToday.Wins
                         UpdateThumb(item.ThumbHWnd, item.ThumbRect, new WindowCaptureHelper.Rect(item.ProcSetting.X + widthMargin, item.ProcSetting.Y, item.ProcSetting.X + item.ProcSetting.Width + widthMargin, procSetting.Y + item.ProcSetting.Height));
                     }
                     _appWindow.Resize(new Windows.Graphics.SizeInt32(w - SPAN, _intelDics.Max(p => p.Value.ThumbRect.Bottom)));
+                    Start();
                 }
                 else
                 {
                     //没有监控则关闭窗口
-                    StopScreenshot();
                     Close();
                 }
                 return true;
@@ -198,7 +203,7 @@ namespace NotToday.Wins
         #region 定期截图
         private object Locker = new object();
         private bool _stopScreenshot = true;
-        private void StartScreenshot()
+        public void Start()
         {
             lock (Locker)
             {
@@ -242,7 +247,7 @@ namespace NotToday.Wins
                     catch (Exception ex)
                     {
                         Log.Error(ex);
-                        StopScreenshot();
+                        Stop();
                         this.DispatcherQueue.TryEnqueue(() =>
                         {
                             Window window = new Window();
@@ -257,7 +262,7 @@ namespace NotToday.Wins
                 }
             });
         }
-        private void StopScreenshot()
+        public void Stop()
         {
             lock (Locker)
             {

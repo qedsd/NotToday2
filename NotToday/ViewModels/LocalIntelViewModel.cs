@@ -313,8 +313,10 @@ namespace NotToday.ViewModels
 
         public ICommand StartCommand => new RelayCommand(() =>
         {
+            _localIntelWindow?.Stop();
             if (Start(ProcSetting))
             {
+                _localIntelWindow.Start();
                 Save();
                 Window?.ShowSuccess("已开始监控");
             }
@@ -335,10 +337,12 @@ namespace NotToday.ViewModels
 
         public ICommand StartAllCommand => new RelayCommand(() =>
         {
+            _localIntelWindow?.Stop();
             foreach (var p in Processes.Where(p => !p.Running).ToList())
             {
                 Start(GetProcess(p));
             }
+            _localIntelWindow?.Start();
             Save();
         });
 
